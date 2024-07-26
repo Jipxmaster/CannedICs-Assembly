@@ -1,0 +1,28 @@
+#location 0000: goto main routine
+ap 37 ap 00 aj ff aj ff
+###slow_delay
+####################################
+#byte:		value		0000
+#short int:	return		0001
+####################################
+#location 0008: load value
+ap 00 ap 00 aj 00 maj 
+#location 000f: inc value, if carry goto 0024, else store
+ap 24 ap 00 aj 01 ap 00 ap 00 amw 
+#location 001a: goto 0008
+ap 08 ap 00 aj 00 aj ff aj 01
+#location 0024: return
+ap 02 ap 00 aj 00 maj 	#load return_l into au
+ap 01 ap 00 map aap 	#load return_h and reg a into mar
+aj 00 aj ff aj 01 	#jump to mar
+####main function
+#location 0037: slow_delay(return) = 005c
+aj 00 aj 5c ap 01 ap 00 amw aj 00 aj 00 ap 02 ap 00 amw 
+#location 0049: value = ff
+aj 00 aj ff ap 00 ap 00 amw
+#location 0052: goto slow_delay
+ap 08 ap 00 aj 00 aj ff aj 01
+#location 005c: output = ff
+ow ff
+#location 005e: end of program
+ap 5e ap 00 aj 00 aj ff aj 01

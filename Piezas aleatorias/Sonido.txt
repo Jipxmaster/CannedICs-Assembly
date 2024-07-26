@@ -1,0 +1,17 @@
+		#l 0000
+ow 01
+zap zap zmw
+		#l 0005
+zap zap zaj maj
+ap 15 zap aj 01
+zap amw
+ap 05 zap aj ff
+		#l 0015
+zow
+zap zap zmw
+		#l 0019
+zap zap zaj maj
+nop nop aj 01
+nop amw
+ap 19 zap aj ff
+		#l 0028

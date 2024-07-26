@@ -1,0 +1,104 @@
+#
+#--------------------------------
+#--------------------------------
+# 15/8 Bit division
+# -Little endian
+# [0000] a_l
+# [0001] a_h
+# [0002] b_l
+# [0003] b_h
+# [0004] c_l
+# [0005] d_l
+# [0006] d_h
+# [0007] temp_a_l
+# [0008] temp_a_h
+# [00f8] ret_l
+# [00f9] ret_a
+#location 023f: c = 01, d = 0000
+ap 04 zap mw 01
+ap 07 zap zmw
+ap 08 zap zmw
+#
+# while c != 00
+#
+# if (a - b) > 0 then
+#location 024c: temp_a_x = a_x
+zap zapaj maj ap 07 zap amw
+ap 01 zapaj maj ap 08 zap amw
+#location 025b: negate a_x
+zap zapaj map ap 01
+maj zap zap amw
+ap 01 zapaj map ap 01
+maj ap 01 zap amw
+#location 026f: add a_x, b_x
+ap fe zap mw 7f
+ap ff zap mw 02
+ap 91 aj ff aj ff
+#location 027f: negate a_x
+zap zapaj map ap 01
+maj zap zap amw
+ap 01 zapaj map ap 01
+maj ap 01 zap amw
+#location 0283: if a_l != 00 goto 0291
+zapaj maj ap 91 ap 02 aj ff
+#location 028b: goto 0340
+ap 40 ap 03 aj ff
+#location 0291: if a_h != 00 goto 02a0
+ap 01 zapaj ap a0 ap 02 aj ff
+#location 029a: goto 0340
+ap 40 ap 03 aj ff
+#
+# a = a - b(this operation has been done
+# there is no need for doing it again)
+# d = d + c
+#location 02a0: temp_a_x = d_x
+ap 05 zapaj maj ap 07 zap amw
+ap 06 zapaj maj ap 08 zap amw
+#location 02b0: d_x = b_x
+ap 02 zapaj maj ap 05 zap amw
+ap 03 zapaj maj ap 06 zap amw
+#location 02c0: b_x = temp_a_x
+ap 07 zapaj maj ap 02 zap amw
+ap 08 zapaj maj ap 03 zap amw
+#location 02d0: temp_a_x = a_x
+zap zapaj maj ap 07 zap amw
+ap 01 zapaj maj ap 08 zap amw
+#location 02df: a_x = c_l
+ap 04 zapaj maj zap amw
+ap 01 zap zmw
+#location 02e9: add a, b
+ap fe zap mw fa
+ap ff zap mw 02
+ap 91 zap aj ff aj ff
+#location 02fa: a_x = temp_a_x
+ap 07 zapaj maj zap amw
+ap 08 zapaj maj ap 01 zap amw
+#location 0308: temp_a_x = b_x
+ap 02 zapaj maj ap 07 zap amw
+ap 03 zapaj maj ap 08 zap amw
+#location 0318: b_x = d_x
+ap 05 zapaj maj ap 02 zap amw
+ap 06 zapaj maj ap 03 zap amw
+#location 0328: d_x = temp_a_x
+ap 07 zapaj maj ap 05 zap amw
+ap 08 zapaj maj ap 06 zap amw
+#location 0338: goto 0350
+ap 50 ap 03 aj ff aj ff
+#location 0340: a_x = temp_a_x; a_x will be as it was never subtracted
+ap 07 zapaj maj zap zap amw
+ap 08 zapaj maj ap 01 zap amw
+#
+# end if
+#
+# if (a > (b + b) then
+#location 034f: temp_a_x = b_x
+ap 02 zapaj maj ap 07 zap amw
+ap 03 zapaj maj ap 08 zap amw
+#location 035f: a_x = b_x
+ap 02 zapaj maj zap amw
+ap 03 zapaj maj ap 01 zap amw
+#location 036d: shift left a_x
+ap fc zap mw xx
+ap fd zap mw xx
+ap 48 ap 01 aj ff aj ff
+#location 

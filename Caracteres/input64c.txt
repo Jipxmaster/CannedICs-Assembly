@@ -1,0 +1,1315 @@
+#--------------------------------
+#--------------------------------
+# Not table initialization
+# -From 0100-01ff
+# [0000] counter
+# [0001] value
+#location 0000: value = ff, counter = 00
+ap 01 zap mw ff zap zmw
+#
+# while (counter + 1) != carry
+#location 0007: (counter, 01) = value
+ap 01 zapaj maj
+zap map ap 01 amw
+#location 0010: value -= 1
+zapaj aj ff maj amw
+#location 0015: counter += 1; if carry goto 0023
+zapaj maj ap 23 zap
+aj 01 zap amw
+#location 001e: goto 0007
+ap 07 zap aj ff
+#--------------------------------
+#--------------------------------
+# Right circular shift table
+# -From 0200-02ff
+# [0000] counter
+# [0001] value
+#location 0023: counter = 00, value = 00
+ap 01 zap zmw zap zmw
+#
+# while (counter + 1) != carry
+#location 0029: (counter, 02) = value
+ap 01 zapaj maj
+zap map ap 02 amw
+#location 0032: value += 80
+ap 01 zapaj
+aj 80 maj amw
+#location 0039: counter += 1
+zapaj aj 01 maj amw
+#location 003e: (counter, 02) = value
+ap 01 zapaj maj
+zap map ap 02 amw
+#location 0047: value += 81
+ap 01 zapaj aj 81
+maj amw
+#location 004e: counter += 1; if carry goto 005c
+zapaj maj ap 5c zap
+aj 01 zap amw
+#location 0057: goto 0029
+ap 29 zap aj ff
+#--------------------------------
+#--------------------------------
+# Right shift table
+# -From 0300-03ff
+# [0000] counter
+# [0001] value
+#location 005c: counter = 00, value = 00
+ap 01 zap zmw zap zmw
+#
+#while (counter + 1) != carry
+#location 0062: (counter, 03) = value
+ap 01 zapaj maj
+zap map ap 03 amw
+#location 006b: counter += 01
+zap zapaj aj 01 maj amw
+#location 0071: (counter, 03) = value
+ap 01 zapaj maj
+zap map ap 03 amw
+#location 007a: value += 1
+ap 01 zapaj aj 01 maj amw     ### MAIN FUNCTION ADDRESS ###
+#location 0081: counter += 1; if carry goto 489 ##########
+zapaj maj ap 89 ap 04
+aj 01 zap zap amw
+#location 008c: goto 0062
+ap 62 zap aj ff
+#--------------------------------
+#--------------------------------
+# 14 Bit addition
+# -Little endian
+# C6543210 Bit order
+# 00000000 Data
+# [0000] a_l
+# [0001] a_h
+# [0002] b_l
+# [0003] b_h
+# [000c] carry flag
+# [000e] ret_l
+# [000f] ret_h
+#
+# low byte addition
+#l 91: a_l += b_l
+zap zapaj maj
+ap 02 zap maj
+zap amw
+#l 9a: if a_l + 80 = carry goto a6
+zaj maj
+ap a6 zap aj 80
+#l a1: goto af
+ap af zap aj 80
+#l a6: store a_l; a_h += 1
+zap amw
+ap 01 zapaj maj
+aj 01 amw
+#
+# high byte addition
+#l af: a_h += b_h
+ap 01 zapaj maj
+ap 03 zap maj
+ap 01 zap amw
+#l bb: if b_h + 80 = carry goto cb
+zaj maj
+ap cb zap aj 80
+#l c2: carry_flag = 00; goto d4
+ap 0c zap zmw
+ap d4 zap aj 80
+#l cb: store a_h; carry_flag = 01
+ap 01 zap amw
+ap 0c zap mw 01
+#
+# return operation
+#l d4: return
+ap 0f zapaj maj
+ap 0e zap map aap
+aj ff aj ff
+#--------------------------------
+#--------------------------------
+# 14 bit rotate left
+# -Little endian
+# bit 0 = carry
+# carry = bit 13
+# [0000] a_l
+# [0001] a_h
+# [000b] temp_carry
+# [000c] carry_flag
+# [0010] ret_l
+# [0011] ret_h
+#
+# high left shift
+#l e1: a_h += a_h
+ap 01 zapaj maj maj amw
+#l e7: if a_h + 80 = carry goto f3
+zaj maj ap f3 zap aj 80
+#l ee: goto fc
+ap fc zap aj 80
+#l f3: store a_h; temp_carry = 01
+ap 01 zap amw
+ap 0b zap mw 01
+#
+# low left shift
+#l fc: a_l = a_l + a_l + carry_flag
+zapaj maj maj amw
+ap 0c zapaj maj
+zap maj amw
+#l 107: if a_l + 80 = carry goto 115
+zaj maj ap 15 ap 01 aj 80
+#l 10f: goto 11f
+ap 1f ap 01 aj 80
+#l 115: store a_l; a_h += 80
+zap zap amw
+ap 01 zapaj aj 01 maj amw
+#
+# carry flag udpate
+#l 11f: carry_flag = temp_carry
+ap 0b zapaj maj ap 0c zap amw
+#l 127: reset temp carry
+ap 0b zap zmw
+#
+# return function
+#l 12b:
+ap 11 zapaj maj
+ap 10 zap map aap
+aj ff aj ff
+#--------------------------------
+#--------------------------------
+# 14 bit rotate right
+# -Little endian
+# bit 13 = carry
+# carry = bit 0
+# [0000] a_l
+# [0001] a_h
+# [000c] carry_flag
+# [0012] ret_l
+# [0013] ret_h
+#
+# rotate left a_l; a_h
+#l 138
+zap zapaj map ap 02 maj zap zap amw
+ap 01 zapaj map ap 02 maj ap 01 zap amw
+#
+# if a_h + 80 = carry goto 158
+#l 14c
+ap 58 ap 01 aj 80
+#l 152: goto 161
+ap 61 ap 01 aj 80
+#l 158: store a_h; a_l += 40
+ap 01 zap amw
+zapaj aj 40 maj amw
+#
+# if carry = 1 goto 171
+#l 161
+ap 0c zapaj maj
+ap 71 ap 01 aj ff
+#l 16b: goto 178
+ap 78 ap 01 aj 01
+#l 171: a_h += 40
+ap 01 zapaj aj 40 maj amw
+#
+# if a_l + 80 = carry goto 18b
+#l 178
+zap zapaj maj
+ap 8b ap 01 aj 80
+ap 0c zap zmw
+#l 185: goto 193
+ap 93 ap 01 aj 80
+#l 18b: store a_l; carry_flag = 01
+zap zap amw
+ap 0c zap mw 01
+#
+# return operation
+#l 193
+ap 13 zapaj maj
+ap 12 zap map aap
+aj ff aj ff
+#--------------------------------
+#--------------------------------
+# 14 bit multiplication
+# -Little edian
+# -Has its own ov flag
+# [0000] a_l
+# [0001] a_h
+# [0002] b_l
+# [0003] b_h
+# [0004] c_l
+# [0005] c_h
+# [0006] d_l
+# [0007] d_h
+# [0008] e_l
+# [0009] e_h
+# [000b] temp_carry
+# [000c] carry_flag
+# [000d] overflow_flag
+# [0014] ret_l
+# [0015] ret_h
+#
+#l 1a0: c = 0
+ap 04 zap zmw
+ap 05 zap zmw
+#
+#l 1a8: d_l = f2; d_h = 00
+ap 06 zap mw f2
+ap 07 zap zmw
+#
+#l 1b1: overflow_flag = 00
+ap 0d zap zmw
+#
+#l 1b5: carry_flag = d_h
+ap 07 zapaj maj
+ap 0c zap amw
+#
+# rotate right b
+#l 1bd: e = a
+zap zapaj maj ap 08 zap amw
+ap 01 zapaj maj ap 09 zap amw
+#l 1cc: a = b
+ap 02 zapaj maj zap amw
+ap 03 zapaj maj ap 01 zap amw
+#l 1da: rotate right a
+ap 12 zap mw ec
+ap 13 zap mw 01
+ap 38 ap 01 aj ff aj ff
+#l 1ec: b = a
+zap zapaj maj ap 02 zap amw
+ap 01 zapaj maj ap 03 zap amw
+#l 1fb: a = e
+ap 08 zapaj maj zap amw
+ap 09 zapaj maj ap 01 zap amw
+#
+#l 209: d_h = carry_flag
+ap 0c zapaj maj
+ap 07 zap amw
+#
+#l 211: if carry_flag = 01 goto 221
+ap 0c zapaj maj
+ap 21 ap 02 aj ff
+#
+#l 21b: goto 297
+ap 97 ap 02 aj 01
+#
+# c = c + a
+#l 221: e = b
+ap 02 zapaj maj ap 08 zap amw
+ap 03 zapaj maj ap 09 zap amw
+#l 231: b = a
+zapaj maj ap 02 zap amw
+ap 01 zapaj maj ap 03 zap amw
+#l 23f: a = c
+ap 04 zapaj maj zap amw
+ap 05 zapaj maj ap 01 zap amw
+#l 24d: add a, b
+ap 0e zap mw 5e
+ap 0f zap mw 02
+ap 91 zap aj ff aj ff
+#l 25e: c = a
+zap zapaj maj ap 04 zap amw
+ap 01 zapaj maj ap 05 zap amw
+#l 26d: a = b
+ap 02 zapaj maj zap amw
+ap 03 zapaj maj ap 01 zap amw
+#l 27b: b = e
+ap 08 zapaj maj ap 02 zap amw
+ap 09 zapaj maj ap 03 zap amw
+#
+#l 28b: overflow_flag update
+ap 0d zapaj maj
+ap 0b zap maj
+ap 0d zap amw
+#
+#l 297: carry_flag = 0
+ap 0c zap zmw
+#
+#l 29b: rotate left a
+ap 10 zap mw ac
+ap 11 zap mw 02
+ap e1 zap aj ff aj ff
+#
+#l 2ac: temp_overflow update
+ap 0c zapaj maj
+ap 0b zap amw
+#
+# inc d_l; if not zero goto 2c8
+#l 2b4:
+ap 06 zapaj maj
+ap c8 ap 02 aj 01
+ap 06 zap amw
+#
+#l 2c2: goto 1b5
+ap b5 ap 01 aj ff
+#
+#l 2c8: a = c
+ap 04 zapaj maj zap amw
+ap 05 zapaj maj ap 01 zap amw
+#l 2d6: return operation
+ap 15 zapaj maj
+ap 14 zap map aap
+aj ff aj ff
+#--------------------------------
+#--------------------------------
+# 14 bit division
+# -Little edian
+# [0000] a_l
+# [0001] a_h
+# [0002] b_l
+# [0003] b_h
+# [0004] c_l
+# [0005] c_h
+# [0006] d_l
+# [0007] d_h
+# [0008] e_l
+# [0009] e_h
+# [000a] f
+# [0016] ret_l
+# [0017] ret_h
+#
+#l 2e3: c = a
+zap zapaj maj ap 04 zap amw
+ap 01 zapaj maj ap 05 zap amw
+#l 2f2: d = b
+ap 02 zapaj maj ap 06 zap amw
+ap 03 zapaj maj ap 07 zap amw
+#l 302: f = f2
+ap 0a zap mw f2
+#l 307: e = 0000
+ap 08 zap zmw
+ap 09 zap zmw
+#
+# rl c
+#l 30f: a = c
+ap 04 zapaj maj zap amw
+ap 05 zapaj maj ap 01 zap amw
+#l 31d: rl a
+ap 10 zap mw 2e
+ap 11 zap mw 03
+ap e1 zap aj ff aj ff
+#l 32e: c = a
+zap zapaj maj ap 04 zap amw
+ap 01 zapaj maj ap 05 zap amw
+#
+# rl e
+#l 33d: a = e
+ap 08 zapaj maj zap amw
+ap 09 zapaj maj ap 01 zap amw
+#l 34b: rl a
+ap 10 zap mw 5c
+ap 11 zap mw 03
+ap e1 zap aj ff aj ff
+#l 35c: e = a
+zap zapaj maj ap 08 zap amw
+ap 01 zapaj maj ap 09 zap amw
+#
+# e = e - d
+#l 36b: a = e
+ap 08 zapaj maj zap amw
+ap 09 zapaj maj ap 01 zap amw
+#l 379: b = d
+ap 06 zapaj maj ap 02 zap amw
+ap 07 zapaj maj ap 03 zap amw
+#l 389: negate a
+zap zapaj map ap 01 aj 80 maj zap zap amw
+ap 01 zapaj map ap 01 aj 80 maj zap amw
+#l 39f: add a, b
+ap 0e zap mw b0
+ap 0f zap mw 03
+ap 91 zap aj ff aj ff
+#l 3b0: negate a
+zap zapaj map ap 01 aj 80 maj zap zap amw
+ap 01 zapaj map ap 01 aj 80 maj zap amw
+#l 3c6: e = a
+zap zapaj maj ap 08 zap amw
+ap 01 zapaj maj ap 09 zap amw
+#
+# if not carry goto 423
+#l 3d5: if carry = 0 goto 3e5
+ap 0c zapaj maj
+ap e5 ap 03 aj ff
+#l 3df: goto 41a
+ap 23 ap 04 aj 01
+#
+# e = e + d
+#l 3e5: a = e
+ap 08 zapaj maj zap amw
+ap 09 zapaj maj ap 01 zap amw
+#l 3f3: b = d
+ap 06 zapaj maj ap 02 zap amw
+ap 07 zapaj maj ap 03 zap amw
+#l 403: add a, b
+ap 0e zap mw 14
+ap 0f zap mw 04
+ap 91 zap aj ff aj ff
+#l 414: e = a
+zap zapaj maj ap 08 zap amw
+ap 01 zapaj maj ap 09 zap amw
+#
+#l 423: f + 1; if zero goto 437
+ap 0a zapaj maj
+ap 37 ap 04 aj 01
+ap 0a zap amw
+#
+#l 431: goto 30f
+ap 0f ap 03 aj ff
+#
+#l 437: b = f
+ap 08 zapaj maj ap 02 zap amw
+ap 09 zapaj maj ap 03 zap amw
+#
+#l 447: a = c
+ap 04 zapaj maj zap amw
+ap 05 zapaj maj ap 01 zap amw
+#
+#l 455: rotate left a
+ap 10 zap mw 66
+ap 11 zap mw 04
+ap e1 zap aj ff aj ff
+#
+#l 466: negate a
+zap zapaj map ap 01 aj 80 maj zap zap amw
+ap 01 zapaj map ap 01 aj 80 maj zap amw
+#
+#l 47c: return
+ap 17 zapaj maj
+ap 16 zap map aap
+aj ff aj ff
+#--------------------------------
+#--------------------------------
+# Load 3x5 character set
+# From 0400 to 053f
+#location 0489
+zaj
+aj	04
+#location 048c	character  
+ap	00	aap	mw	00
+ap	01	aap	mw	00
+ap	02	aap	mw	00
+ap	03	aap	mw	00
+ap	04	aap	mw	00
+#location 04a5	character !
+ap	05	aap	mw	02
+ap	06	aap	mw	02
+ap	07	aap	mw	02
+ap	08	aap	mw	00
+ap	09	aap	mw	02
+#location 04be	character "
+ap	0a	aap	mw	05
+ap	0b	aap	mw	05
+ap	0c	aap	mw	00
+ap	0d	aap	mw	00
+ap	0e	aap	mw	00
+#location 04d7	character ▄
+ap	0f	aap	mw	00
+ap	10	aap	mw	00
+ap	11	aap	mw	05
+ap	12	aap	mw	0f
+ap	13	aap	mw	0f
+#location 04f0	character ▀
+ap	14	aap	mw	0f
+ap	15	aap	mw	0f
+ap	16	aap	mw	05
+ap	17	aap	mw	00
+ap	18	aap	mw	00
+#location 0509	character %
+ap	19	aap	mw	04
+ap	1a	aap	mw	01
+ap	1b	aap	mw	02
+ap	1c	aap	mw	04
+ap	1d	aap	mw	01
+#location 0522	character █
+ap	1e	aap	mw	0f
+ap	1f	aap	mw	0f
+ap	20	aap	mw	0f
+ap	21	aap	mw	0f
+ap	22	aap	mw	0f
+#location 053b	character '
+ap	23	aap	mw	02
+ap	24	aap	mw	02
+ap	25	aap	mw	00
+ap	26	aap	mw	00
+ap	27	aap	mw	00
+#location 0554	character (
+ap	28	aap	mw	02
+ap	29	aap	mw	04
+ap	2a	aap	mw	04
+ap	2b	aap	mw	04
+ap	2c	aap	mw	02
+#location 056d	character )
+ap	2d	aap	mw	02
+ap	2e	aap	mw	01
+ap	2f	aap	mw	01
+ap	30	aap	mw	01
+ap	31	aap	mw	02
+#location 0586	character *
+ap	32	aap	mw	00
+ap	33	aap	mw	05
+ap	34	aap	mw	02
+ap	35	aap	mw	05
+ap	36	aap	mw	00
+#location 059f	character +
+ap	37	aap	mw	00
+ap	38	aap	mw	02
+ap	39	aap	mw	07
+ap	3a	aap	mw	02
+ap	3b	aap	mw	00
+#location 05b8	character ,
+ap	3c	aap	mw	00
+ap	3d	aap	mw	00
+ap	3e	aap	mw	02
+ap	3f	aap	mw	02
+ap	40	aap	mw	04
+#location 05d1	character -
+ap	41	aap	mw	00
+ap	42	aap	mw	00
+ap	43	aap	mw	07
+ap	44	aap	mw	00
+ap	45	aap	mw	00
+#location 05ea	character .
+ap	46	aap	mw	00
+ap	47	aap	mw	00
+ap	48	aap	mw	00
+ap	49	aap	mw	00
+ap	4a	aap	mw	02
+#location 0603	character /
+ap	4b	aap	mw	01
+ap	4c	aap	mw	01
+ap	4d	aap	mw	02
+ap	4e	aap	mw	04
+ap	4f	aap	mw	04
+#location 061c	character 0
+ap	50	aap	mw	02
+ap	51	aap	mw	05
+ap	52	aap	mw	05
+ap	53	aap	mw	05
+ap	54	aap	mw	02
+#location 0635	character 1
+ap	55	aap	mw	02
+ap	56	aap	mw	06
+ap	57	aap	mw	02
+ap	58	aap	mw	02
+ap	59	aap	mw	02
+#location 064e	character 2
+ap	5a	aap	mw	07
+ap	5b	aap	mw	01
+ap	5c	aap	mw	07
+ap	5d	aap	mw	04
+ap	5e	aap	mw	07
+#location 0667	character 3
+ap	5f	aap	mw	06
+ap	60	aap	mw	01
+ap	61	aap	mw	06
+ap	62	aap	mw	01
+ap	63	aap	mw	06
+#location 0680	character 4
+ap	64	aap	mw	05
+ap	65	aap	mw	05
+ap	66	aap	mw	07
+ap	67	aap	mw	01
+ap	68	aap	mw	01
+#location 0699	character 5
+ap	69	aap	mw	07
+ap	6a	aap	mw	04
+ap	6b	aap	mw	07
+ap	6c	aap	mw	01
+ap	6d	aap	mw	07
+#location 06b2	character 6
+ap	6e	aap	mw	03
+ap	6f	aap	mw	04
+ap	70	aap	mw	07
+ap	71	aap	mw	05
+ap	72	aap	mw	07
+#location 06cb	character 7
+ap	73	aap	mw	07
+ap	74	aap	mw	01
+ap	75	aap	mw	02
+ap	76	aap	mw	04
+ap	77	aap	mw	04
+#location 06e4	character 8
+ap	78	aap	mw	07
+ap	79	aap	mw	05
+ap	7a	aap	mw	07
+ap	7b	aap	mw	05
+ap	7c	aap	mw	07
+#location 06fd	character 9
+ap	7d	aap	mw	07
+ap	7e	aap	mw	05
+ap	7f	aap	mw	07
+ap	80	aap	mw	01
+ap	81	aap	mw	07
+#location 0716	character :
+ap	82	aap	mw	00
+ap	83	aap	mw	02
+ap	84	aap	mw	00
+ap	85	aap	mw	02
+ap	86	aap	mw	00
+#location 072f	character ;
+ap	87	aap	mw	00
+ap	88	aap	mw	02
+ap	89	aap	mw	00
+ap	8a	aap	mw	02
+ap	8b	aap	mw	04
+#location 0748	character <
+ap	8c	aap	mw	01
+ap	8d	aap	mw	02
+ap	8e	aap	mw	04
+ap	8f	aap	mw	02
+ap	90	aap	mw	01
+#location 0761	character =
+ap	91	aap	mw	00
+ap	92	aap	mw	07
+ap	93	aap	mw	00
+ap	94	aap	mw	07
+ap	95	aap	mw	00
+#location 077a	character >
+ap	96	aap	mw	04
+ap	97	aap	mw	02
+ap	98	aap	mw	01
+ap	99	aap	mw	02
+ap	9a	aap	mw	04
+#location 0793	character ?
+ap	9b	aap	mw	07
+ap	9c	aap	mw	01
+ap	9d	aap	mw	02
+ap	9e	aap	mw	00
+ap	9f	aap	mw	02
+#location 07ac	character @
+ap	a0	aap	mw	07
+ap	a1	aap	mw	05
+ap	a2	aap	mw	05
+ap	a3	aap	mw	04
+ap	a4	aap	mw	07
+#location 07c5	character A
+ap	a5	aap	mw	03
+ap	a6	aap	mw	05
+ap	a7	aap	mw	07
+ap	a8	aap	mw	05
+ap	a9	aap	mw	05
+#location 07de	character B
+ap	aa	aap	mw	06
+ap	ab	aap	mw	05
+ap	ac	aap	mw	07
+ap	ad	aap	mw	05
+ap	ae	aap	mw	06
+#location 07f7	character C
+ap	af	aap	mw	03
+ap	b0	aap	mw	04
+ap	b1	aap	mw	04
+ap	b2	aap	mw	04
+ap	b3	aap	mw	03
+#location 0810	character D
+ap	b4	aap	mw	06
+ap	b5	aap	mw	05
+ap	b6	aap	mw	05
+ap	b7	aap	mw	05
+ap	b8	aap	mw	06
+#location 0829	character E
+ap	b9	aap	mw	07
+ap	ba	aap	mw	04
+ap	bb	aap	mw	06
+ap	bc	aap	mw	04
+ap	bd	aap	mw	07
+#location 0842	character F
+ap	be	aap	mw	07
+ap	bf	aap	mw	04
+ap	c0	aap	mw	06
+ap	c1	aap	mw	04
+ap	c2	aap	mw	04
+#location 085b	character G
+ap	c3	aap	mw	07
+ap	c4	aap	mw	04
+ap	c5	aap	mw	05
+ap	c6	aap	mw	05
+ap	c7	aap	mw	07
+#location 0874	character H
+ap	c8	aap	mw	05
+ap	c9	aap	mw	05
+ap	ca	aap	mw	07
+ap	cb	aap	mw	05
+ap	cc	aap	mw	05
+#location 088d	character I
+ap	cd	aap	mw	07
+ap	ce	aap	mw	02
+ap	cf	aap	mw	02
+ap	d0	aap	mw	02
+ap	d1	aap	mw	07
+#location 08a6	character J
+ap	d2	aap	mw	07
+ap	d3	aap	mw	01
+ap	d4	aap	mw	01
+ap	d5	aap	mw	05
+ap	d6	aap	mw	03
+#location 08bf	character K
+ap	d7	aap	mw	05
+ap	d8	aap	mw	05
+ap	d9	aap	mw	06
+ap	da	aap	mw	05
+ap	db	aap	mw	05
+#location 08d8	character L
+ap	dc	aap	mw	04
+ap	dd	aap	mw	04
+ap	de	aap	mw	04
+ap	df	aap	mw	04
+ap	e0	aap	mw	07
+#location 08f1	character M
+ap	e1	aap	mw	05
+ap	e2	aap	mw	07
+ap	e3	aap	mw	05
+ap	e4	aap	mw	05
+ap	e5	aap	mw	05
+#location 090a	character N
+ap	e6	aap	mw	07
+ap	e7	aap	mw	05
+ap	e8	aap	mw	05
+ap	e9	aap	mw	05
+ap	ea	aap	mw	05
+#location 0923	character O
+ap	eb	aap	mw	07
+ap	ec	aap	mw	05
+ap	ed	aap	mw	05
+ap	ee	aap	mw	05
+ap	ef	aap	mw	07
+#location 093c	character P
+ap	f0	aap	mw	07
+ap	f1	aap	mw	05
+ap	f2	aap	mw	07
+ap	f3	aap	mw	04
+ap	f4	aap	mw	04
+#location 0955	character Q
+ap	f5	aap	mw	07
+ap	f6	aap	mw	05
+ap	f7	aap	mw	05
+ap	f8	aap	mw	07
+ap	f9	aap	mw	01
+#location 096e	character R
+ap	fa	aap	mw	07
+ap	fb	aap	mw	05
+ap	fc	aap	mw	06
+ap	fd	aap	mw	05
+ap	fe	aap	mw	05
+#location 0987	character S
+ap	ff	aap	mw	07
+zaj aj 05
+ap	00	aap	mw	04
+ap	01	aap	mw	07
+ap	02	aap	mw	01
+ap	03	aap	mw	07
+#location 09a3	character T
+ap	04	aap	mw	07
+ap	05	aap	mw	02
+ap	06	aap	mw	02
+ap	07	aap	mw	02
+ap	08	aap	mw	02
+#location 09bc	character U
+ap	09	aap	mw	05
+ap	0a	aap	mw	05
+ap	0b	aap	mw	05
+ap	0c	aap	mw	05
+ap	0d	aap	mw	07
+#location 09d5	character V
+ap	0e	aap	mw	05
+ap	0f	aap	mw	05
+ap	10	aap	mw	05
+ap	11	aap	mw	05
+ap	12	aap	mw	02
+#location 09ee	character W
+ap	13	aap	mw	05
+ap	14	aap	mw	05
+ap	15	aap	mw	05
+ap	16	aap	mw	07
+ap	17	aap	mw	05
+#location 0a07	character X
+ap	18	aap	mw	05
+ap	19	aap	mw	05
+ap	1a	aap	mw	02
+ap	1b	aap	mw	05
+ap	1c	aap	mw	05
+#location 0a20	character Y
+ap	1d	aap	mw	05
+ap	1e	aap	mw	05
+ap	1f	aap	mw	02
+ap	20	aap	mw	02
+ap	21	aap	mw	02
+#location 0a39	character Z
+ap	22	aap	mw	07
+ap	23	aap	mw	01
+ap	24	aap	mw	02
+ap	25	aap	mw	04
+ap	26	aap	mw	07
+#location 0a4f	character [
+ap	27	aap	mw	07
+ap	28	aap	mw	04
+ap	29	aap	mw	04
+ap	2a	aap	mw	04
+ap	2b	aap	mw	07
+#location 0a6b	character \
+ap	2c	aap	mw	04
+ap	2d	aap	mw	04
+ap	2e	aap	mw	02
+ap	2f	aap	mw	01
+ap	30	aap	mw	01
+#location 0a84	character ]
+ap	31	aap	mw	07
+ap	32	aap	mw	01
+ap	33	aap	mw	01
+ap	34	aap	mw	01
+ap	35	aap	mw	07
+#location 0a9d	character ^
+ap	36	aap	mw	02
+ap	37	aap	mw	05
+ap	38	aap	mw	00
+ap	39	aap	mw	00
+ap	3a	aap	mw	00
+#location 0ab6	character _
+ap	3b	aap	mw	00
+ap	3c	aap	mw	00
+ap	3d	aap	mw	00
+ap	3e	aap	mw	00
+ap	3f	aap	mw	07
+#location 0acf	goto main function ##########################################################################
+ap ad ap 0d aj ff
+#--------------------------------
+#--------------------------------
+# Character place
+# [0000] character
+# [0018] char_switch
+# [0019] scr_loc
+# [001a] counter_a
+# [001b] counter_b
+# [001c] return_l
+# [001d] return_h
+#
+#l ad5: counter_a = fa
+ap 1a zap mw fb
+#
+### char = (char * 5) + 400 ###
+###########################
+###   l ada: a, b = tb_l
+zap zapaj maj ap 02 zap amw
+ap 03 zap zmw
+ap 01 zap zmw
+###   l ae9: counter_b = fc
+ap 1b zap mw fc
+###   l aee: add a, b
+ap 0e zap mw ff
+ap 0f zap mw 0a
+ap 91 zap aj ff aj ff
+###   l aff: inc counter_b; if carry goto b13
+ap 1b zapaj maj
+ap 13 ap 0b aj 01
+ap 1b zap amw
+###   l b0d: goto aee
+ap ee ap 0a aj ff
+###   l b13: circular right shift(a_h) + 80: if carry goto b2a
+ap 01 zapaj map ap 02 maj
+ap 01 zap amw
+ap 2a ap 0b aj 80
+###   l b24: goto b33
+ap 33 ap 0b aj 80
+###   l b2a: store a_h; a_h += 80
+ap 01 zap amw
+zapaj aj 80 maj amw
+###   l b33: a_h += 04
+ap 01 zapaj aj 04 maj amw
+### character place mode ###
+############################
+#l b3a: if switch_char = 1 goto b5c
+ap 18 zapaj maj
+ap 5c ap 0b aj ff
+#
+#l b44: RAM[character] = RAM[scr_loc]
+ap 01 zapaj maj
+zap map aap
+zaj maj
+ap 19 zap map ap ff amw
+#l b54: goto b7b
+ap 7b ap 0b aj ff aj ff
+#
+#l b5c: RAM[character] += RAM[scr_loc]
+ap 01 zapaj maj
+ap 00 zap map aap
+map ap 02
+map ap 02
+map ap 02
+map ap 02
+zaj maj
+ap 19 zap map ap ff maj amw
+### character = character + 1 ###
+###################
+#l b7b: character += 01
+zap zap maj
+ap 8d ap 0b aj 01
+zap zap amw
+#l b87: goto b97
+ap 97 ap 0b aj ff
+#l b8d: store character_l; character_h += 1
+zap zap amw
+ap 01 zapaj aj 01 maj amw
+### scr_loc += 4 ###
+###################
+#l b97: scr_loc += 04
+ap 19 zapaj maj aj 04 amw
+### inc ta, if not zero goto b3a ###
+####################################
+#l b9e: inc counter_a; if carry goto bb2
+ap 1a zapaj maj
+ap b2 ap 0b aj 01
+ap 1a zap amw
+#l bac: goto b3a
+ap 3a ap 0b aj ff
+#
+#l bb2: return
+ap 1d zapaj maj
+ap 1c zap map aap
+aj ff aj ff
+#--------------------------------
+#--------------------------------
+# 256 byte maximum block transfer
+# [001e] destination
+# [0020] source
+# [0022] size
+# [0023] temporal
+# [0024] return
+#
+# (destination) = (source) ~ 63 bytes
+###   bbf: temporal = (source)
+ap 21 zapaj maj
+ap 20 zap map aap
+zaj maj ap 23 zap amw
+###   bce: negate destination_h
+ap 1f zapaj maj map ap 01
+zaj maj ap 1f zap amw
+###   bdb: destination_h = negate(destination_h + source)
+ap 23 zap maj aap ap 01
+zaj maj ap 1f zap amw
+###   be8: write operation
+ap 1f zapaj maj
+ap 23 zap maj
+ap 1e zap map aap
+zaj amw
+###   bf7: revover destination_h
+ap 23 zapaj maj
+ap 1f zap maj amw
+#
+# increment destination
+###   c00: destination_l += 01; if carry goto c14
+ap 1e zapaj maj
+ap 14 ap 0c aj 01
+ap 1e zap amw
+###   c0e: goto c1f
+ap 1f ap 0c aj ff
+###   c14: store destination_l; destination_h += 01
+ap 1e zap amw
+ap 1f zapaj aj 01 maj amw
+#
+# increment source
+###   c1f: source_l += 01; if carry goto c33
+ap 20 zapaj maj
+ap 33 ap 0c aj 01
+ap 20 zap amw
+###   c2d: goto c3e
+ap 3e ap 0c aj ff
+###   c33: store source_l; source_h += 01
+ap 20 zap amw
+ap 21 zapaj aj 01 maj amw
+#
+# increment size
+###   c3e: size += 01; if carry goto c52
+ap 22 zapaj maj
+ap 52 ap 0c aj 01
+ap 22 zap amw
+###   c4c: goto bbf
+ap bf ap 0b aj ff
+#
+# return
+###   c52
+ap 25 zapaj maj
+ap 24 zap map aap
+aj ff
+#--------------------------------
+#--------------------------------
+# 256 byte maximum block erase
+# [001e] destination
+# [0022] size
+# [0024] return
+#
+###   c5d: (destination) = 00
+ap 1f zapaj maj
+ap 1e zap map aap zmw
+#
+# increment destination
+###   c67: destination_l += 01; if carry goto c7b
+ap 1e zapaj maj
+ap 7b ap 0c aj 01
+ap 1e zap amw
+###   c75: goto c86
+ap 86 ap 0c aj ff
+###   c7b: store destination_l; destination_h += 01
+ap 1e zap amw
+ap 1f zapaj aj 01 maj amw
+#
+###   c86: increment size; if zero goto c9a
+ap 22 zapaj maj
+ap 9a ap 0c aj 01
+ap 22 zap amw
+###   c94: goto c5d
+ap 5d ap 0c aj ff
+#
+###   c9a: return
+ap 25 zapaj maj
+ap 24 zap map aap
+aj ff
+#--------------------------------
+#--------------------------------
+# Print string
+# [0026] 2 string_addr
+# [0028] 1 size
+# [0029] 1 counter
+# [002a] 1 t_switch
+# [002b] 1 t_screen_loc
+# [002c] 2 return
+#
+# initial variables
+###   ca5: counter = f8
+ap 29 zap mw f8
+###   caa: t_screen_loc = e0
+ap 2b zap mw e0
+###   caf: t_swtich = 00
+ap 2a zap zmw
+#
+# great while loop
+#
+# printing stuff
+###   cb3: character = (string_addr)
+ap 27 zapaj maj
+ap 26 zap map aap
+zaj maj
+zap zap amw
+###   cc1: char_switch = t_switch
+ap 2a zapaj maj
+ap 18 zap amw
+###   cc9: scr_loc = t_sceen_loc
+ap 2b zapaj maj
+ap 19 zap amw
+###   cd1: print
+ap 1c zap mw e3
+ap 1d zap mw 0c
+ap d5 ap 0a aj ff aj ff
+#
+###   ce3: increment size; if carry goto da2
+ap 28 zapaj maj
+ap a2 ap 0d aj 01
+ap 28 zap amw
+#
+# increment string_addr
+###   cf1: increment string_addr_l; if carry goto d05
+ap 26 zapaj maj
+ap 05 ap 0d aj 01
+ap 26 zap amw
+###   cff: goto d10
+ap 10 ap 0d aj ff
+###   d05: store_string_addr_l; increment string_addr_h
+ap 26 zap amw
+ap 27 zapaj aj 01 maj amw
+#
+# increment counter
+###   d10: increment counter; if carry goto d24
+ap 29 zapaj maj
+ap 24 ap 0d aj 01
+ap 29 zap amw
+###   d1e: goto d7a
+ap 7a ap 0d aj ff
+#
+###   d24: counter = f8
+ap 29 zap mw f8
+###   d29: scroll
+ap 1e zap mw 80 #destination ff80
+ap 1f zap mw ff
+ap 20 zap mw 98 #source ff98
+ap 21 zap mw ff
+ap 22 zap mw a0 #size = 60
+ap 24 zap mw 54 #ret_l = 54
+ap 25 zap mw 0d #ret_h = 0d
+ap bf ap 0b
+aj ff aj ff
+###   d54: blank first line
+ap 1e zap mw e0
+ap 1f zap mw ff
+ap 22 zap mw e8
+ap 24 zap mw 75
+ap 25 zap mw 0d
+ap 5d ap 0c aj ff aj ff
+###   d75: t_screen_loc = df
+ap 2b zap mw df
+#
+# toggle t_switch
+###   d7a: if t_switch + ff not carry t_switch = 01
+ap 2a zapaj maj
+ap 8f ap 0d aj ff
+ap 2a zap mw 01
+###   d89: goto cb3
+ap b3 ap 0c aj 01
+###   d8f: t_switch = 00
+ap 2a zap zmw
+###   d93: increment t_screen_loc
+ap 2b zapaj aj 01 maj amw
+#
+###   d9a: goto cb3
+ap b3 ap 0c aj ff aj ff
+#
+###   da2: return
+ap 2d zapaj maj
+ap 2c zap map aap aj ff
+#--------------------------------
+#--------------------------------
+# INPUT FUNCTION
+# [002e] 2 string addr
+# [0030] 1 size
+# [0031] 1 counter
+# [0032] 1 t_switch
+# [0033] 1 t_screen_loc
+# [0034] 2 return
+#
+# first variables
+###   dad: size = 00
+ap 30 zap zmw
+###   db1: counter = f8
+ap 31 zap mw f8
+###   db6: t_switch = 00
+ap 32 zap zmw
+###   dba: t_screen_loc = e0
+ap 33 zap mw e0
+#
+# input handle
+###   dbf: if input != 00 goto dcd
+ap cd ap 0d zaj iaj aj ff
+###   dc7: goto dbf
+ap bf ap 0d aj 01
+#
+# if enter is detected
+###   dcd: if (negate(input) + 0a) + 1 = carry goto de1
+iap ap 01 zaj aj 0a maj aaj
+ap e1 ap 0d aj 01
+###   ddb: goto e2d
+ap 2d ap 0e aj ff
+###   de1: scroll
+ap 1e zap mw 80 #destination ff80
+ap 1f zap mw ff
+ap 20 zap mw 98 #source ff98
+ap 21 zap mw ff
+ap 22 zap mw a0 #size = 60
+ap 24 zap mw 0c #ret_l = 0c
+ap 25 zap mw 0e #ret_h = 0e
+ap bf ap 0b
+aj ff aj ff
+###   e0c: blank first line
+ap 1e zap mw e0 #video ram ffe0
+ap 1f zap mw ff
+ap 22 zap mw e8 #size 18
+ap 24 zap mw a2 #return fa2
+ap 25 zap mw 0f
+ap 5d ap 0c aj ff aj ff
+#
+# if backspace is detected
+###   e2d: if (negate(input) + 08) + 1 = carry goto e41
+iap ap 01 zaj aj 08 maj aaj
+ap 41 ap 0e aj 01
+###   e3b: goto e99
+ap 99 ap 0e aj ff
+###   e41: if (negate(counter) + f8) + 1 = carry goto e56
+ap 31 zapaj map ap 01
+aj f8 maj ap 56 ap 0e aj 01
+###   e50: goto e74
+ap 74 ap 0e aj ff
+###   e56: decrement counter
+ap 31 zapaj aj ff maj amw
+###   e5d: decrement t_screen_loc
+ap 33 zapaj aj ff maj amw
+###   e64: decrement size
+ap 30 zapaj aj ff maj amw
+# toggle t_switch
+###   e6b: if t_switch + ff not carry t_switch = 01
+ap 32 zapaj maj
+ap 70 ap 0e aj ff
+ap 32 zap mw 01
+###   e6a: goto e74
+ap 74 ap 0e aj ff
+###   e70: t_switch = 00
+ap 32 zap zmw
+###   e74: print ' '
+zap zap zmw
+ap 32 zapaj maj ap 18 zap amw
+ap 33 zapaj maj ap 19 zap amw
+ap 1c zap mw bf
+ap 1f zap mw 0d
+ap d5 ap 0a aj ff aj ff
+#
+# print character
+###   e99
+zapaj aj e0 iaj zap amw
+ap 32 zapaj maj ap 18 zap amw
+ap 33 zapaj maj ap 19 zap amw
+ap 1c zap mw b9
+ap 1d zap mw 0e
+ap d5 ap 0a aj ff aj ff
+#
+###   ec1: if size = 20 goto fa2
+ap 30 zapaj map ap 01
+aj 20 maj ap a2 ap 0f aj 01
+###   ed0: increment size
+ap 30 zapaj aj 01 maj amw
+#
+###   ed7: (string_addr) = input
+ap 2f zapaj maj
+ap 2e zap map aap imw
+###   ee1: increment string_addr
+ap 2e zapaj maj
+ap f5 ap 0e aj 01
+ap 2e zap amw
+###   eef: goto f10
+ap 10 ap 0f aj ff
+###   ef5: store string_addr_l; increment string_addr_h
+ap 2e zap amw
+ap 2f zapaj aj 01 maj amw
+#
+###   f10: increment counter; if carry goto f24
+ap 31 zapaj maj
+ap 24 ap 0f aj 01
+ap 31 zap amw
+###   f1e: goto f7a
+ap 7a ap 0f aj ff
+#
+###   f24: counter = f8
+ap 31 zap mw f8
+###   f29: scroll
+ap 1e zap mw 80 #destination ff80
+ap 1f zap mw ff
+ap 20 zap mw 98 #source ff98
+ap 21 zap mw ff
+ap 22 zap mw a0 #size = 60
+ap 24 zap mw 54 #ret_l = 54
+ap 25 zap mw 0f #ret_h = 0d
+ap bf ap 0b
+aj ff aj ff
+###   f54: blank first line
+ap 1e zap mw e0
+ap 1f zap mw ff
+ap 22 zap mw e8
+ap 24 zap mw 75
+ap 25 zap mw 0f
+ap 5d ap 0c aj ff aj ff
+###   f75: t_screen_loc = df
+ap 33 zap mw df
+#
+###   f7a: if t_switch + ff not carry t_switch = 01
+ap 32 zapaj maj
+ap 8f ap 0f aj ff
+ap 32 zap amw
+###   f89: goto f93
+ap 93 ap 0f aj 01
+###   f8f: t_switch = 00
+ap 32 zap zmw
+###   f93: increment screen_loc
+ap 33 zapaj aj 01 maj amw
+#
+###   f9a: goto dbf
+ap bf ap 0d aj ff aj ff
+#
+###   fa2: return
+ap 35 zapaj maj
+ap 34 zap map aap aj ff
+#

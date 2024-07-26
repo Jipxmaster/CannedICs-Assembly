@@ -1,0 +1,36 @@
+RAM memory map
+0000-00ff	Zero page
+0100-01ff	Not table
+0200-02ff	Circular right shift
+0300-03ff	Right shift
+0400-053f	Character set
+0540-07ff	Text
+ff80-ffff	Video memory
+
+Character write:
+  -Ascii character
+  -First/Second
+  -Column_
+  -Row_
+  -Return
+
+a = 5
+while a != 0
+	Charset = Ascii_Char * 5 + 400
+	Col = Column * 4 + ff80 + row
+	If first:
+		ram(Col) = Charset
+	If second:
+		ram(Col) += Charset
+	a -= 1
+return
+
+# Character place
+# [0012] byte		Character
+# [0013] byte		First/Second
+# [0014] byte		Column
+# [0015] byte		Row
+# [0016] short int	A
+# [0018] short int	B
+# [00f4] short int	Return
+vv

@@ -1,0 +1,48 @@
+#279.79 chars per second	7148 cycles
+#1737.62 chars per second	1152 cycles
+#1760.56 chars per second	1136 cycles
+#1766.78 chars per second	1132 cycles
+
+14 bit addition: 00, 01, 02, 03, 10, fe, ff
+rotate left: 00, 02, 0f, 10, fc, fd
+rotate right: 00, 01, 10, fa, fb
+14 bit multiplication: 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 0e, 10, 11, f8, f9
+14 bit division: 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 0a, f6, f7
+
+00, 01	a register
+02, 03	b register
+04, 05	c register
+06, 07  d register
+08, 09  e register
+0a	f register
+
+0e temporal carry	0b temporal carry
+10 carry		0c carry
+11 overflow		0d overflow
+
+fe, ff	addition return		0e, 0f
+fc, fd	rotate left return	10, 11
+fa, fb	rotate right return	12, 13
+f8, f9	multiplication return	14, 15
+f6, f7	division return		16, 17
+table:	768 bytes (2.34% of 32768)
+Math:	24 bytes (9.3% of 256)
+total:	2.41%
+
+character	18
+char_switch	19
+scr_loc		1a
+return		1b 1c
+
+counter1	1d
+counter2	1e
+
+Character:
+7 bytes of ram out of 256 (2.7% of 256) (0.02% of 32768)
+
+ta 16		counter
+tb 17 18	character
+tc 19		scr_loc
+switch char 1a
+3.41%
+1119 bytes

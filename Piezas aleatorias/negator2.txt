@@ -1,0 +1,161 @@
+#Note: Main program function call in address 0064
+
+#Initialize not table
+#From 0100 to 01ff
+#Variable list:
+#Type		Name		Address
+################################################
+#byte		value		0001
+#byte		counter		0000
+#
+#address 0000: value = 00
+ap 01 zap zmw
+
+#address 0004: counter = 00
+zap zmw
+
+###### // while counter != 100
+
+#address 0006: load value
+ap 01 zap zaj aj ff maj 
+
+#address 000d: (01, counter) = value
+zap map ap 01 amw
+
+#address 0012: store value
+zap amw
+
+#address 0014: counter += 1; if carry goto 0023
+zap zaj maj ap 23 zap aj 01 zap amw
+
+#address 001e: goto 0006
+ap 06 zap aj ff
+
+#Initialize right circular shift table
+#From 0200 to 02ff
+#Variable list:
+################################################
+#byte		counter		0000
+#byte		value		0001
+#
+#address 0023: counter = 00, value = 00
+ap 01 zap zmw zap zmw
+
+#address 0029: (02, counter) = value
+ap 01 zap zaj maj zap ap 02 amw
+
+#address 0032: value += 80
+ap 01 zap zaj aj 80 maj amw
+
+#address 003a counter += 1
+zap zaj aj 01 maj amw 
+
+#address 0040: (02, counter) = value
+ap 01 zap zaj maj zap map ap 02 amw
+
+#address 004a: value += 81
+ap 01 zap zaj aj 81 maj amw
+
+#address 0052: counter += 1, if carry goto 0064
+zap zaj maj ap 64 zap aj 01 zap zap amw
+
+#address 005d: goto 0029
+ap 29 zap aj ff aj ff
+
+#address 0064: goto main function 
+ap 22 ap 01 aj ff aj ff 
+
+#15 bit addition
+#Variable list:
+################################################
+#short int 	a		0000
+#short int 	b		0002
+#short int 	return		0004
+#address 006c: a_h = a_h + a_h
+ap 01 zap zaj maj maj amw
+
+#address 0073: b_h = b_h + b_h
+ap 03 zap zaj maj maj amw
+
+#address 007a: add a_l 80; if carry goto 008b
+zap zap zaj maj ap 8b zap aj 80 
+
+#address 0083: goto 0096
+ap 96 zap zaj aj ff aj 01
+
+#address 008b: store a_l
+zap zap amw 
+
+#address 008e: a_h = a_h + 1
+ap 01 zap zaj aj 01 maj amw 
+
+#address 0096: add b_l 80; if carry goto 00a8
+ap 02 zap zaj maj ap a8 zap aj 80
+
+#address 00a0: goto 00b4
+ap b4 zap zaj aj ff aj 01
+
+#address 00a8: store b_h 
+ap 02 zap amw 
+
+#address 00ac: b_h = b_h + 1
+ap 03 zap zaj aj 01 maj amw 
+
+#address 00b4: a_h = a_h + b_h 
+ap 01 zap zaj maj ap 03 zap maj ap 01 zap amw
+
+#address 00c1: a_l = a_l + b_l
+zap zap zaj maj ap 02 zap maj zap zap amw
+
+#address 00cc: add a_l 80; if carry goto 00dd
+zap zap zaj maj ap dd zap aj 80 
+
+#address 00d5: goto 00e8
+ap e8 zap zaj aj ff aj 01 
+
+#address 00dd: store a_l
+zap zap maj 
+
+#address 00e0: a_h = a_h + 2
+ap 01 zap zaj aj 02 maj amw
+
+#address 00e8: circular shift right a_h
+ap 01 zap map ap 02 zaj maj ap 01 zap amw 
+
+#address 00f4: add a_h 80; if carry goto 0108
+ap 01 zap zaj maj ap 08 ap 01 aj 80 
+
+#address 00ff: goto 0113
+ap 13 ap 01 zaj aj ff aj 01
+
+#address 0108: store a_h
+ap 01 zap amw 
+
+#address 010c: a_l = a_l + 80 
+zap zap zaj aj 80 maj amw 
+
+#address 0113: return 
+ap 05 zap zaj maj ap 04 zap map aap zaj aj ff aj 01 
+
+############################
+#15 bit addition (a86d, 92aa, 0148)
+############################
+#address 0122: 15 bit addition a = a86d
+zap zap mw 6d ap 01 zap mw a8
+
+#address 012b: 15 bit addition b = 92aa
+ap 02 zap mw aa ap 03 zap mw 92 
+
+#address 0135: return = 0148
+ap 04 zap mw 48 ap 05 zap mw 01
+
+#address 013f: goto 15 bit addition function 
+ap 6c ap 00 zaj aj ff aj 01 
+
+#address 0148: output a, end of program
+zap zap mow ap 01 zap mow 
+
+#address 014f: end of program
+ap 4f ap 01 zaj aj ff aj 01 
+
+#address 0158

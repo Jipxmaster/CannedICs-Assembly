@@ -1,0 +1,57 @@
+#
+###a_x conversion into 15 bit number
+#
+#location 00d6: a_h = a_h + a_h
+ap 01 zap zaj maj maj amw
+#location 00dd: add a_l, 80; if carry goto 00ee
+zap zap zaj maj ap ee zap aj 80
+#location 00e6: goto 00f9
+ap f9 zap zaj aj ff aj 01
+#location 00ee: a_l = acc; a_h += 01
+zap zap amw ap 01 zap zaj aj 01 maj amw
+#
+###b_x conversion into 15 bit number
+#
+#location 00f9: b_h = b_h + b_h
+ap 02 zap zaj maj maj amw
+#location 0100: add b_l, 80; if carry goto 0114
+ap 02 zap zaj maj ap 14 ap 01 aj 80
+#location 010b: goto 0120
+ap 20 ap 01 zaj aj ff aj 01
+#location 0114: b_l = acc; b_h += 01
+ap 02 zap amw ap 03 zap zaj aj 01 maj amw
+#
+###low byte addition
+#
+#location 0120: a_l = a_l + b_l
+zap zap zaj maj ap 02 zap maj zap amw
+#location 012a: add a_l, 80; if carry goto 013d
+zap zap zaj maj ap 3d ap 01 aj 80
+#location 0134: goto 0148
+ap 48 ap 01 zaj aj ff aj 01
+#location 013d: a_l = acc; a_h += 01
+zap zap amw ap 01 zap zaj aj 01 maj amw
+#
+###high byte addition
+#
+#location 0148: a_h = a_h + b_h
+ap 01 zap zaj maj ap 03 zap maj ap 01
+zap amw
+#
+###a_x final conversion
+#
+#location 0155: right circular shift a_h
+ap 01 zap zaj map ap 02 zaj maj ap 01
+zap amw
+#location 0162: add a_h + 80; if carry goto 0176
+ap 01 zap zaj maj ap 76 ap 01 aj 80
+#location 016d: goto 0181
+ap 81 ap 01 zaj aj ff aj 01
+#location 0176: a_h = acc; a_l += 80
+ap 01 zap amw zap zap zaj aj 80 maj amw
+#
+###return function
+#
+#location 0181:
+ap 04 zap zaj maj ap 05 zap aap map 
+zaj aj ff aj 01

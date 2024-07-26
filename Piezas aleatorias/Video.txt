@@ -1,0 +1,97 @@
+#location 0000: value = fb
+zap zap mw fb
+##############
+#long sync
+#value	0000
+##############
+#location 0004: sync level and 16 no ops
+zow
+nop nop nop nop
+nop nop nop nop
+nop nop nop nop
+nop nop nop nop
+#location 0015: add value, 01; if carry goto 002a
+zap zap zaj maj
+ap 2a zap aj 01
+#location 001e: store value
+zap amw
+#location 0020: goto 0004, black level
+ap 04 zap zaj
+aj ff ow 01 aj
+01
+#location 002a: return = 59, value = fb, black level
+nop ap 01 zap
+mw 59 zap mw fb
+ow 01 nop
+##############
+#short sync
+#value  0000
+#return 0001
+##############
+#location 0036: sync level and 1 no op
+zow
+nop
+#location 0038: black level and 13 no ops
+ow 01
+nop nop nop nop
+nop nop nop nop
+nop nop nop nop
+nop
+#location 0047: add value, 01; if carry goto return
+zap zap zaj maj
+ap 01 zap map
+zap aj 01 zap
+amw
+#location 0054: goto 0036
+ap 36 zap zaj
+aj ff aj 01
+#location 005c: return = b0, value = 00
+ap 01 zap mw
+b0 zap zmw nop
+nop
+##############
+#video frame
+#value  0000
+#return 0001
+##############
+#location 0065: sync level and 3 no ops
+ow 00
+nop nop nop
+#location 006a: black level and 7 no ops
+ow 01
+nop nop nop nop
+nop nop nop
+#location 0073: gray level and 12 no ops
+ow 02
+nop nop nop nop
+nop nop nop nop
+nop nop nop nop
+#location 0081: white level and 12 no ops
+ow 03
+nop nop nop nop
+nop nop nop nop
+nop nop nop nop
+#location 008f: gray level and 7 no ops
+ow 02
+nop nop nop nop
+nop nop nop
+#location 0098: add value, 01; if carry goto return and white level
+zap zap zaj maj
+ap 01 ow 03 zap
+map zap aj 01
+nop zap amw
+#location 00a8: goto 0065
+ap 65 zap zaj
+aj ff aj 01
+#location 00b0: return = bd, value = d0; goto 0065
+ap 01 zap mw bd
+zap mw d0 ap 65
+zap aj ff
+#location 00bd: return = ca, value = fa; goto 0036
+ap 01 zap mw ca
+zap mw fa ap 36
+zap aj ff
+#location 00ca: goto 0000
+ap 00
+aj ff nop nop
+#location 00d0

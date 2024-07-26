@@ -1,0 +1,47 @@
+####################################
+#Creating not table
+#From 0100 to 01ff
+####################################
+#Variable table:
+#byte		b		0000
+#byte		a		0001
+####################################
+#location 0000: a = 00
+ap 01	ap z	mw z
+#location 0004: b = 00
+ap z	mw z
+### while a != ff
+#location 0006: a ajc ff
+ap 01	ap z	ajc z	aj ff	maj
+#location 000d: ram[01, counter] = register a
+ap z 	map 	ap 01	amw
+#location 0012: a = register a
+ap z 	amw
+#location 0014: b += 1, if carry goto 0023
+ap z 	aj z	maj 	ap 23	ap z 	aj 01 	ap z 	amw
+#location 001e: goto 0006
+ap 06 	ap z	aj ff
+####################################
+#Substract number
+####################################
+#Variable table:
+#byte		b		0000
+#byte		a		0001
+####################################
+#location 0023: 
+
+a = 04
+b = 01
+a = ~a
+a = a + b
+a = ~a
+
+short int 	a 	0000
+byte		b	0002
+a = ffff
+b = 55
+ap 01	ap z	aj z	maj	#load a_h
+ap 02	ap z	maj		#load b
+ap z	map			#load a_l into mar
+aap				#load a_h + b into mar
+aj z	amw			#ram = b

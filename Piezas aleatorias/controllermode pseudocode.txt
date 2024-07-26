@@ -1,0 +1,36 @@
+pin_number = 8
+counter = 8
+
+1000 0000
+0100 0000
+0010 0000
+0001 0000
+0000 1000
+0000 0100
+0000 0010
+0000 0001
+1000 0000
+
+pin_number = 8
+variable = ff
+
+
+counter = pin_number - 8
+
+while pin_number != 0:
+	right circular shift (out_data)
+	pin_number -= 1
+
+add out_data 80, if carry:
+	if variable = 00: 
+		out_data += 80
+if not carry:
+	if variable = ff:
+		out_data += 80
+
+while counter not carry:
+	right circular_shift (out_data)
+	counter += 1
+
+output out_data
+return 

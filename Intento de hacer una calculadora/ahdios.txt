@@ -1,0 +1,129 @@
+###
+#
+#16 bit left shift
+#-little endian
+#################################
+###a_l		0000
+###a_h		0001
+###return_l	00fc
+###return_h	00fd
+#
+###main operation
+#
+#location 015f: a_h += a_h
+ap 01 zap zaj maj maj amw 
+#location 0166: add a_l, 80; if carry goto 0175
+zap zaj maj ap 75 ap 01 aj 80
+#location 016f: goto 0180
+ap 80 ap 01 aj ff
+#location 0175: a_l = acc; a_h += 1
+zap zap amw ap 01 zap zaj aj 01 maj amw
+#location 0180: a_l += a_l
+zap zap zaj maj maj amw
+#
+###return operation
+#
+#location 0186: return
+ap fd zap zaj maj ap fc zap map aap
+aj ff aj 01
+###
+#
+#15/8 bit multiplication 
+#-little endian
+#################################
+###a_l      0000
+###a_h      0001
+###b_l      0002
+###b_h      0003
+###overflow 0005
+###temp_a_l 0006
+###temp_a_h 0007
+###repeater 0008
+###temp_b_l 0009
+###return_l 00fa
+###return_h 00fb
+#
+###assignating initial variables
+#
+#location 0194: repeater = f8
+ap 08 zap mw f8
+#location 0199: temp_a = 0000
+ap 06 zap zmw
+ap 07 zap zmw
+#
+###while repeater != 00
+#
+#location 01a1: right_circular_shift(b_l)
+ap 02 3f map ap 02 maj ap 02 zap amw
+#location 01ac: add b_l, 80; if carry goto 01bc
+ap 02 3f maj ap bc ap 01 aj 80
+#location 01b6: goto 021c
+ap 1c ap 02 aj 80
+#
+###temp_a_x = temp_a_x + a_x
+#
+#location 01bc: temp_b_l = b_l
+ap 02 3f maj ap 09 zap amw
+#location 01c4: b_x = a_x
+zap 3f maj ap 02 zap amw
+ap 01 3f maj ap 03 zap amw
+#location 01d3: a_x = temp_a_x
+ap 06 3f maj zap amw
+ap 07 3f maj ap 01 zap amw
+#location 01e1: add a_x, b_x
+ap fe zap mw f2
+ap ff zap mw 01
+ap 9f zap aj ff aj ff
+#location 01f2: temp_a_x = a_x
+zap 3f maj ap 06 zap amw
+ap 01 3f maj ap 07 zap amw
+#location 0201: a_x = b_x
+ap 02 3f maj zap amw
+ap 03 3f maj ap 01 zap amw
+#location 020f: b_l = temp_b_l; b_h = 00
+ap 03 zap mw 00
+ap 09 3f maj ap 02 zap amw
+#
+###end of addition
+#
+#location 021c: shift left a_x
+ap fc zap mw 2e
+ap fd zap mw 02
+ap 5f ap 01 aj ff aj ff
+#location 022e: repeater += 01; if carry goto 0242
+ap 08 3f maj ap 42 ap 02 aj 01 ap 08 zap amw
+#location 023c: goto 01a1
+ap a1 ap 01 aj ff
+#
+###end of while loop
+#
+#location 0242: returning operation
+ap fb 3f maj ap fa zap map
+aap aj ff
+#
+########MAIN FUNCTION######
+#
+###multiply 21 and 3dec
+#
+#location 024d: a = 003f
+zap zap mw 3f
+ap 01 zap mw 00
+#location 0256: b = 004e
+ap 02 zap mw 4e
+ap 03 zap mw 00
+#location 0260: return = 0272
+ap fa zap mw 72
+ap fb zap mw 02
+#location 026a: goto multiply
+ap 94 ap 01 aj ff aj ff
+#
+###output end of program
+#
+#location 0272: end
+ap 72 ap 02 aj ff aj ff 
+#location 027a
+#
+###The error in the multiplication happens because
+###there is no final conversion for the b_x variable.
+###so, my multiplication routine was right but not the
+###addition. Amazing to have found the error!

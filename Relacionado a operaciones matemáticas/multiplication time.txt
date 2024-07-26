@@ -1,0 +1,10 @@
+332-513 multiplications per second
+A	B
+0000	0000	16ea	5866
+0000	3fff	0f38	3896
+3fff	0000	1784	6020
+3fff	3fff	0f46	3910
+
+
+2984	10628 clock cycles	188 divisions per second
+2a3c	10812 clock cycles	184 divisions per second

@@ -1,0 +1,92 @@
+#--------------------------------
+#--------------------------------
+# 15/8 Bit multiplication
+# -Little endian
+# [0000] a_l
+# [0001] a_h
+# [0002] b_l
+# [0003] b_h
+# [0005] overflow
+# [0006] temp_a_l
+# [0007] temp_a_h
+# [0008] repeater
+# [0009] temp_h_l
+# [00fa] ret_l
+# [00fb] ret_h
+#
+# assignating initial variables
+#location 0191: repeater = f8
+ap 08 zap mw f8
+#location 0196: temp_a = 0000
+ap 06 zap zmw
+ap 07 zap zmw
+#
+# while repeater != 00
+#location 019e: right_circular_shift(b_l)
+ap 02 3f map ap 02 maj ap 02 zap amw
+#location 01a9: add b_l, 80; if carry goto 01b9
+ap 02 3f maj ap b9 ap 01 aj 80
+#location 01b3: goto 0219
+ap 19 ap 02 aj 80
+#
+# temp_a_x = temp_a_x + a_x
+#location 01b9: temp_b_l = b_l
+ap 02 3f maj ap 09 zap amw
+#location 01c1: b_x = a_x
+zap 3f maj ap 02 zap amw
+ap 01 3f maj ap 03 zap amw
+#location 01d0: a_x = temp_a_x
+ap 06 3f maj zap amw
+ap 07 3f maj ap 01 zap amw
+#location 01de: add a_x, b_x
+ap fe zap mw ef
+ap ff zap mw 01
+ap 91 zap aj ff aj ff
+#location 01ef: temp_a_x = a_x
+zap 3f maj ap 06 zap amw
+ap 01 3f maj ap 07 zap amw
+#location 01fe: a_x = b_x
+ap 02 3f maj zap amw
+ap 03 3f maj ap 01 zap amw
+#location 020c: b_l = temp_b_l; b_h = 00
+ap 03 zap mw 00
+ap 09 3f maj ap 02 zap amw
+#
+# end of addition
+#location 0219: shift left a_x
+ap fc zap mw 2b
+ap fd zap mw 02
+ap 61 ap 01 aj ff aj ff
+#location 022b: repeater += 01; if carry goto 023f
+ap 08 3f maj ap 3f ap 02 aj 01 ap 08 zap amw
+#location 0239: goto 019e
+ap 9e ap 01 aj ff
+#
+# end of while loop
+#location 023f: returning operation
+ap fb 3f maj ap fa zap map
+aap aj ff
+#location 024a
+#
+########MAIN FUNCTION######
+#
+###multiply 21 and 3dec
+#
+#location 024a: a = 003f
+zap zap mw 3f
+ap 01 zap mw 00
+#location 0253: b = 004e
+ap 02 zap mw 4e
+ap 03 zap mw 00
+#location 025d: return = 026f
+ap fa zap mw 6f
+ap fb zap mw 02
+#location 0267: goto multiply
+ap 91 ap 01 aj ff aj ff
+#
+###output end of program
+#
+#location 026f: end
+aj ff aj ff
+#location 0273
+#

@@ -1,0 +1,393 @@
+#--------------------------------
+#--------------------------------
+# Load 3x5 character set
+# From 0400 to 053f
+#location 0489
+zaj
+aj	04
+#location 048c	character @
+ap	00	map	mw	07
+ap	01	map	mw	05
+ap	02	map	mw	05
+ap	03	map	mw	04
+ap	04	map	mw	07
+#location 04a5	character A
+ap	05	map	mw	03
+ap	06	map	mw	05
+ap	07	map	mw	07
+ap	08	map	mw	05
+ap	09	map	mw	05
+#location 04be	character B
+ap	0a	map	mw	06
+ap	0b	map	mw	05
+ap	0c	map	mw	07
+ap	0d	map	mw	05
+ap	0e	map	mw	06
+#location 04d7	character C
+ap	0f	map	mw	03
+ap	10	map	mw	04
+ap	11	map	mw	04
+ap	12	map	mw	04
+ap	13	map	mw	03
+#location 04f0	character D
+ap	14	map	mw	03
+ap	15	map	mw	05
+ap	16	map	mw	05
+ap	17	map	mw	05
+ap	18	map	mw	03
+#location 0509	character E
+ap	19	map	mw	07
+ap	1a	map	mw	04
+ap	1b	map	mw	06
+ap	1c	map	mw	04
+ap	1d	map	mw	07
+#location 0522	character F
+ap	1e	map	mw	07
+ap	1f	map	mw	04
+ap	20	map	mw	06
+ap	21	map	mw	04
+ap	22	map	mw	04
+#location 053b	character G
+ap	23	map	mw	07
+ap	24	map	mw	04
+ap	25	map	mw	05
+ap	26	map	mw	05
+ap	27	map	mw	07
+#location 0554	character H
+ap	28	map	mw	05
+ap	29	map	mw	05
+ap	2a	map	mw	07
+ap	2b	map	mw	05
+ap	2c	map	mw	05
+#location 056d	character I
+ap	2d	map	mw	07
+ap	2e	map	mw	02
+ap	2f	map	mw	02
+ap	30	map	mw	02
+ap	31	map	mw	07
+#location 0586	character J
+ap	32	map	mw	07
+ap	33	map	mw	02
+ap	34	map	mw	02
+ap	35	map	mw	05
+ap	36	map	mw	03
+#location 059f	character K
+ap	37	map	mw	05
+ap	38	map	mw	05
+ap	39	map	mw	06
+ap	3a	map	mw	05
+ap	3b	map	mw	05
+#location 05b8	character L
+ap	3c	map	mw	04
+ap	3d	map	mw	04
+ap	3e	map	mw	04
+ap	3f	map	mw	04
+ap	40	map	mw	07
+#location 05d1	character M
+ap	41	map	mw	07
+ap	42	map	mw	05
+ap	43	map	mw	05
+ap	44	map	mw	05
+ap	45	map	mw	05
+#location 05ea	character N
+ap	46	map	mw	07
+ap	47	map	mw	05
+ap	48	map	mw	05
+ap	49	map	mw	05
+ap	4a	map	mw	05
+#location 0603	character O
+ap	4b	map	mw	07
+ap	4c	map	mw	05
+ap	4d	map	mw	05
+ap	4e	map	mw	05
+ap	4f	map	mw	07
+#location 061c	character P
+ap	50	map	mw	07
+ap	51	map	mw	05
+ap	52	map	mw	07
+ap	53	map	mw	04
+ap	54	map	mw	04
+#location 0635	character Q
+ap	55	map	mw	07
+ap	56	map	mw	05
+ap	57	map	mw	05
+ap	58	map	mw	07
+ap	59	map	mw	01
+#location 064e	character R
+ap	5a	map	mw	07
+ap	5b	map	mw	05
+ap	5c	map	mw	06
+ap	5d	map	mw	05
+ap	5e	map	mw	05
+#location 0667	character S
+ap	5f	map	mw	07
+ap	60	map	mw	04
+ap	61	map	mw	07
+ap	62	map	mw	01
+ap	63	map	mw	07
+#location 0680	character T
+ap	64	map	mw	07
+ap	65	map	mw	02
+ap	66	map	mw	02
+ap	67	map	mw	02
+ap	68	map	mw	02
+#location 0699	character U
+ap	69	map	mw	05
+ap	6a	map	mw	05
+ap	6b	map	mw	05
+ap	6c	map	mw	05
+ap	6d	map	mw	07
+#location 06b2	character V
+ap	6e	map	mw	05
+ap	6f	map	mw	05
+ap	70	map	mw	05
+ap	71	map	mw	05
+ap	72	map	mw	02
+#location 06cb	character W
+ap	73	map	mw	05
+ap	74	map	mw	05
+ap	75	map	mw	05
+ap	76	map	mw	07
+ap	77	map	mw	05
+#location 06e4	character X
+ap	78	map	mw	05
+ap	79	map	mw	05
+ap	7a	map	mw	02
+ap	7b	map	mw	05
+ap	7c	map	mw	05
+#location 06fd	character Y
+ap	7d	map	mw	05
+ap	7e	map	mw	05
+ap	7f	map	mw	02
+ap	80	map	mw	02
+ap	81	map	mw	02
+#location 0716	character Z
+ap	82	map	mw	07
+ap	83	map	mw	01
+ap	84	map	mw	02
+ap	85	map	mw	04
+ap	86	map	mw	07
+#location 072f	character [
+ap	87	map	mw	07
+ap	88	map	mw	04
+ap	89	map	mw	04
+ap	8a	map	mw	04
+ap	8b	map	mw	07
+#location 0748	character \
+ap	8c	map	mw	04
+ap	8d	map	mw	04
+ap	8e	map	mw	02
+ap	8f	map	mw	01
+ap	90	map	mw	01
+#location 0761	character ]
+ap	91	map	mw	07
+ap	92	map	mw	01
+ap	93	map	mw	01
+ap	94	map	mw	01
+ap	95	map	mw	07
+#location 077a	character ^
+ap	96	map	mw	02
+ap	97	map	mw	05
+ap	98	map	mw	00
+ap	99	map	mw	00
+ap	9a	map	mw	00
+#location 0793	character _
+ap	9b	map	mw	00
+ap	9c	map	mw	00
+ap	9d	map	mw	00
+ap	9e	map	mw	00
+ap	9f	map	mw	07
+#location 07ac	character  
+ap	a0	map	mw	00
+ap	a1	map	mw	00
+ap	a2	map	mw	00
+ap	a3	map	mw	00
+ap	a4	map	mw	00
+#location 07c5	character !
+ap	a5	map	mw	02
+ap	a6	map	mw	02
+ap	a7	map	mw	02
+ap	a8	map	mw	00
+ap	a9	map	mw	02
+#location 07de	character "
+ap	aa	map	mw	05
+ap	ab	map	mw	05
+ap	ac	map	mw	00
+ap	ad	map	mw	00
+ap	ae	map	mw	00
+#location 07f7	character ▄
+ap	af	map	mw	00
+ap	b0	map	mw	00
+ap	b1	map	mw	05
+ap	b2	map	mw	0f
+ap	b3	map	mw	0f
+#location 0810	character ▀
+ap	b4	map	mw	0f
+ap	b5	map	mw	0f
+ap	b6	map	mw	05
+ap	b7	map	mw	00
+ap	b8	map	mw	00
+#location 0829	character %
+ap	b9	map	mw	04
+ap	ba	map	mw	01
+ap	bb	map	mw	02
+ap	bc	map	mw	04
+ap	bd	map	mw	01
+#location 0842	character █
+ap	be	map	mw	0f
+ap	bf	map	mw	0f
+ap	c0	map	mw	0f
+ap	c1	map	mw	0f
+ap	c2	map	mw	0f
+#location 085b	character '
+ap	c3	map	mw	02
+ap	c4	map	mw	02
+ap	c5	map	mw	00
+ap	c6	map	mw	00
+ap	c7	map	mw	00
+#location 0874	character (
+ap	c8	map	mw	02
+ap	c9	map	mw	04
+ap	ca	map	mw	04
+ap	cb	map	mw	04
+ap	cc	map	mw	02
+#location 088d	character )
+ap	cd	map	mw	02
+ap	ce	map	mw	01
+ap	cf	map	mw	01
+ap	d0	map	mw	01
+ap	d1	map	mw	02
+#location 08a6	character *
+ap	d2	map	mw	00
+ap	d3	map	mw	05
+ap	d4	map	mw	02
+ap	d5	map	mw	05
+ap	d6	map	mw	00
+#location 08bf	character +
+ap	d7	map	mw	00
+ap	d8	map	mw	02
+ap	d9	map	mw	07
+ap	da	map	mw	02
+ap	db	map	mw	00
+#location 08d8	character ,
+ap	dc	map	mw	00
+ap	dd	map	mw	00
+ap	de	map	mw	02
+ap	df	map	mw	02
+ap	e0	map	mw	04
+#location 08f1	character -
+ap	e1	map	mw	00
+ap	e2	map	mw	00
+ap	e3	map	mw	07
+ap	e4	map	mw	00
+ap	e5	map	mw	00
+#location 090a	character .
+ap	e6	map	mw	00
+ap	e7	map	mw	00
+ap	e8	map	mw	00
+ap	e9	map	mw	00
+ap	ea	map	mw	02
+#location 0923	character /
+ap	eb	map	mw	01
+ap	ec	map	mw	01
+ap	ed	map	mw	02
+ap	ee	map	mw	04
+ap	ef	map	mw	04
+#location 093c	character 0
+ap	f0	map	mw	02
+ap	f1	map	mw	05
+ap	f2	map	mw	05
+ap	f3	map	mw	05
+ap	f4	map	mw	02
+#location 0955	character 1
+ap	f5	map	mw	02
+ap	f6	map	mw	06
+ap	f7	map	mw	02
+ap	f8	map	mw	02
+ap	f9	map	mw	02
+#location 096e	character 2
+ap	fa	map	mw	07
+ap	fb	map	mw	01
+ap	fc	map	mw	07
+ap	fd	map	mw	04
+ap	fe	map	mw	07
+#location 0987	character 3
+ap	ff	map	mw	06
+zaj aj 05
+ap	00	map	mw	01
+ap	01	map	mw	06
+ap	02	map	mw	01
+ap	03	map	mw	06
+#location 09a3	character 4
+ap	04	map	mw	05
+ap	05	map	mw	05
+ap	06	map	mw	07
+ap	07	map	mw	01
+ap	08	map	mw	01
+#location 09bc	character 5
+ap	09	map	mw	07
+ap	0a	map	mw	04
+ap	0b	map	mw	07
+ap	0c	map	mw	01
+ap	0d	map	mw	07
+#location 09d5	character 6
+ap	0e	map	mw	03
+ap	0f	map	mw	04
+ap	10	map	mw	07
+ap	11	map	mw	05
+ap	12	map	mw	07
+#location 09ee	character 7
+ap	13	map	mw	07
+ap	14	map	mw	01
+ap	15	map	mw	02
+ap	16	map	mw	04
+ap	17	map	mw	04
+#location 0a07	character 8
+ap	18	map	mw	07
+ap	19	map	mw	05
+ap	1a	map	mw	07
+ap	1b	map	mw	05
+ap	1c	map	mw	07
+#location 0a20	character 9
+ap	1d	map	mw	07
+ap	1e	map	mw	05
+ap	1f	map	mw	07
+ap	20	map	mw	01
+ap	21	map	mw	07
+#location 0a39	character :
+ap	22	map	mw	00
+ap	23	map	mw	02
+ap	24	map	mw	00
+ap	25	map	mw	02
+ap	26	map	mw	00
+#location 0a52	character ;
+ap	27	map	mw	00
+ap	28	map	mw	02
+ap	29	map	mw	00
+ap	2a	map	mw	02
+ap	2b	map	mw	04
+#location 0a6b	character <
+ap	2c	map	mw	01
+ap	2d	map	mw	02
+ap	2e	map	mw	04
+ap	2f	map	mw	02
+ap	30	map	mw	01
+#location 0a84	character =
+ap	31	map	mw	00
+ap	32	map	mw	07
+ap	33	map	mw	00
+ap	34	map	mw	07
+ap	35	map	mw	00
+#location 0a9d	character >
+ap	36	map	mw	04
+ap	37	map	mw	02
+ap	38	map	mw	01
+ap	39	map	mw	02
+ap	3a	map	mw	04
+#location 0ab6	character ?
+ap	3b	map	mw	07
+ap	3c	map	mw	01
+ap	3d	map	mw	02
+ap	3e	map	mw	00
+ap	3f	map	mw	02
+#location 0acf	end of character initialization

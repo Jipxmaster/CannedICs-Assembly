@@ -1,0 +1,252 @@
+#--------------------------------
+# Not table
+# -From 0100-01ff
+# [0000] 1 counter
+# [0001] 1 value
+:nott
+ap 01 zap mw ff			#value = ff
+zap zmw				#counter = 00
+:nott_loop
+ap 01 zapaj maj			#(counter, 01) = value
+zap map ap 01 amw
+zapaj aj ff maj amw		#decrement value
+zapaj maj *rrt			#increment counter, if carry goto rrt
+aj 01 zap amw
+*nott_loop aj ff		#goto nott_loop
+#--------------------------------
+# Rotate Right Table
+# [0000] 1 counter
+# [0001] 1 value
+:rrt
+ap 01 zap zmw			#counter = 00
+zap zmw				#value = 00
+:rrt_loop
+ap 01 zapaj maj			#(counter, 02) = value
+zap map ap 02 amw
+ap 01 zapaj			#value += 80
+aj 80 maj amw
+zapaj aj 01 maj amw		#increment counter
+ap 01 zapaj maj			#(counter, 02) = value
+zap map ap 02 amw
+ap 01 zapaj aj 81		#value += 81
+maj amw
+zapaj maj *main			#increment counter, if carry goto main
+aj 01 zap zap amw
+*rrt_loop aj ff			#goto rrt_loop
+#--------------------------------
+# 14 Bit addition
+# -Little endian
+# C6543210 Bit order
+# 00000000 Data
+# [0000] a_l
+# [0001] a_h
+# [0002] b_l
+# [0003] b_h
+# [000c] carry flag
+# [000e] ret_l
+# [000f] ret_h
+:14add
+# low byte addition
+zap zapaj maj			#a_l += b_l
+ap 02 zap maj
+zap amw
+zaj maj				#if a_l + 80 = carry goto if1
+*14add_if1 aj 80
+*14add_skip1 aj 80		#goto skip1
+:14add_if1
+zap amw				#store a_l; a_h += 1
+ap 01 zapaj maj
+aj 01 amw
+:14add_skip1			#high byte addition
+ap 01 zapaj maj			#a_h += b_h
+ap 03 zap maj
+ap 01 zap amw
+zaj maj				#if b_h + 80 = carry goto if2
+*14add_if2 aj 80
+ap 0c zap zmw			#carry_flag = 00, goto skip2
+*14add_skip2 aj 80
+:14add_if2
+ap 01 zap amw			#store a_h, carry_flag = 01
+ap 0c zap mw 01
+:14add_skip2
+ap 0f zapaj maj			#return operation
+ap 0e zap map aap
+aj ff aj ff
+#--------------------------------
+# 14 bit rotate left
+# -Little endian
+# bit 0 = carry
+# carry = bit 13
+# [0000] a_l
+# [0001] a_h
+# [000b] temp_carry
+# [000c] carry_flag
+# [0010] ret_l
+# [0011] ret_h
+:14rl
+				#high left shift
+ap 01 zapaj maj maj amw		#a_h += a_h
+zaj maj *14rl_if1 aj 80		#if a_h + 80 = carry goto if1
+*14rl_skip1 aj 80		#goto skip1
+:14rl_if1
+ap 01 zap amw			#store a_h
+ap 0b zap mw 01			#temp_carry = 01
+:14rl_skip1
+				#low left shift
+zapaj maj maj amw		#a_l += a_l + carry_flag
+ap 0c zapaj maj
+zap maj amw
+zaj maj *14rl_if2 aj 80		#if a_l + 80 = carry goto if2
+*14rl_skip2 aj 80		#goto skip2
+:14rl_if2
+zap zap amw			#store a_l
+ap 01 zapaj aj 01 maj amw	#a_h += 80
+				#carry flag update
+:14rl_skip2
+ap 0b zapaj maj ap 0c zap amw	#carry_flag = temp_carry
+ap 0b zap zmw			#reset temp_carry
+ap 11 zapaj maj			#return
+ap 10 zap map aap
+aj ff aj ff
+#--------------------------------
+# 14 bit rotate right
+# -Little endian
+# bit 13 = carry
+# carry = bit 0
+# [0000] a_l
+# [0001] a_h
+# [000c] carry_flag
+# [0012] ret_l
+# [0013] ret_h
+:14rr
+zap zapaj map ap 02 maj		#rotate left a_l
+zap zap amw
+ap 01 zapaj map ap 02 maj	#rotate left a_h
+ap 01 zap amw
+#
+*14rr_if1 aj 80			#if a_h + 80 = carry goto if1
+*14rr_skip1 aj 80 		#goto skip1
+:14rr_if1
+ap 01 zap amw			#store a_h
+zapaj aj 40 maj amw		#a_l += 40
+:14rr_skip1
+#
+ap 0c zapaj maj			#if carry = 1 goto if2
+*14rr_if2 aj ff
+*14rr_skip2 aj 01		#goto skip2
+:14rr_if2
+ap 01 zapaj aj 40 maj amw	#a_h += 40
+:14rr_skip2
+#
+zap zapaj maj			#if a_l + 80 = carry goto if3
+*14rr_if3 aj 80
+ap 0c zap amw
+*14rr_skip3 aj 80		#goto skip3
+:14rr_if3
+zap zap amw			#store a_l, carry_flag = 01
+ap 0c zap mw 01
+:14rr_skip3
+#
+ap 13 zapaj maj			#return
+ap 12 zap map aap
+aj ff aj ff
+#--------------------------------
+# 14 bit multiplication
+# -Little edian
+# -Has its own ov flag
+# [0000] a_l
+# [0001] a_h
+# [0002] b_l
+# [0003] b_h
+# [0004] c_l
+# [0005] c_h
+# [0006] d_l
+# [0007] d_h
+# [0008] e_l
+# [0009] e_h
+# [000b] temp_carry
+# [000c] carry_flag
+# [000d] overflow_flag
+# [0014] ret_l
+# [0015] ret_h
+:14mul
+ap 04 zap zmw			#c = 0000
+ap 05 zap zmw
+ap 06 zap mw f2			#d_l = f2
+ap 07 zap zmw			#d_h = 00
+ap 0d zap zmw			#ov_flag = 00
+:14mul_skip2
+ap 07 zapaj maj			#carry_flag = d_h
+ap 0c zap amw
+				#rotate right b
+zap zapaj maj ap 08 zap amw	#e = a
+ap 01 zapaj maj ap 09 zap amw
+ap 02 zapaj maj zap amw		#a = b
+ap 03 zapaj maj ap 01 zap amw
+ap 12 zap mw -14mul_op1		#rotate right a
+ap 13 zap mw +14mul_op1
+*14rr aj ff aj ff
+:14mul_op1
+zap zapaj maj ap 02 zap amw	#b = a
+ap 01 zapaj maj ap 03 zap amw
+ap 08 zapaj maj zap amw		#a = e
+ap 09 zapaj maj ap 01 zap amw
+#
+ap 0c zapaj maj			#d_h = carry_flag
+ap 07 zap amw
+ap 0c zapaj maj			#if carry flag = 01 goto if1
+*14mul_if1 aj ff
+*14mul_skip1 aj 01		#goto skip1
+				#c = c + a
+:14mul_if1
+ap 02 zapaj maj ap 08 zap amw	#e = b
+ap 03 zapaj maj ap 09 zap amw
+zapaj maj ap 02 zap amw		#b = a
+ap 01 zapaj maj ap 03 zap amw
+ap 04 zapaj maj zap amw		#a = c
+ap 05 zapaj maj ap 01 zap amw
+ap 0e zap mw -14mul_op2		#add a, b
+ap 0f zap mw +14mul_op2
+*14add aj ff
+:14mul_op2
+zap zapaj maj ap 04 zap amw	#c = a
+ap 01 zapaj maj ap 05 zap amw
+ap 02 zapaj maj zap amw		#a = b
+ap 03 zapaj maj ap 01 zap amw
+ap 08 zapaj maj ap 02 zap amw	#b = e
+ap 09 zapaj maj ap 03 zap amw
+#
+ap 0d zapaj maj			#ov_flag update
+ap 0b zap maj
+ap 0d zap amw
+:14mul_skip1
+ap 0c zap zmw			#carry_flag = 0
+ap 10 zap mw -14mul_op3		#rotate left a
+ap 11 zap mw +14mul_op3
+*14rl aj ff aj ff
+:14mul_op3
+ap 0c zapaj maj			#temp_overflow update
+ap 0b zap amw
+ap 06 zapaj maj			#increment d_l, if not zero goto if2
+*14mul_if2 aj 01
+ap 06 zap amw
+*14mul_skip2 aj ff			#goto skip2
+#
+:14mul_if2
+ap 04 zapaj maj zap amw		#a = c
+ap 05 zapaj maj ap 01 zap amw
+ap 15 zapaj maj			#return
+ap 14 zap map aap
+aj ff aj ff
+#--------------------------------
+# MAIN FUNCTION
+:main
+zap zap mw 01
+ap 01 zap mw 04
+ap 02 zap mw 06
+ap 03 zap mw 00
+ap 12 zap mw -end
+ap 13 zap mw +end
+*14mul aj ff aj ff
+:end
+aj ff

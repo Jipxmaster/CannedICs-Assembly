@@ -1,0 +1,49 @@
+if input != 00
+	if input = 09:
+		print ' '
+	else:
+		print(input + e0)
+output 01 // clear input register
+output 00
+
+Note:
+when a key is pressed: a register wired directly to the input is written
+after printing a character, that register is written with 00
+
+string addr
+
+Machine language
+short simple syntax programming language
+
+string addr
+size
+counter
+t_switch
+t_screen_loc
+
+size = 00
+counter = f8
+t_switch = 00
+t_screen_loc = e0
+
+while size != 20:
+	if input != 00:
+		if input == 0a:
+			scroll
+			return
+		else if input == 08 and size != 00:
+			decrement t_screen_loc
+			toggle t_switch
+			print(t_screen_loc, 00, t_switch)
+			decrement size
+			decrement counter
+		else:
+			print(t_screen_loc, input, t_switch)
+			increment size
+			increment counter
+			if counter == 00:
+				counter = f8
+				scroll
+			increment t_screen_loc
+	toggle t_switch
+return
