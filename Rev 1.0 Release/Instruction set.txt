@@ -1,0 +1,34 @@
+0	ADD/JPC
+1	APP
+2	RAMW
+3	OW
+4	PMOE
+5	AOE
+6	RAMOE
+7	INOE
+
+# not instruction
+not	*ef
+
+# From ROM
+aj	*ee	# add and jump if carry
+ap	*ed	# append address
+mw	*eb	# ram write
+ow	*e7	# output
+
+# From Accumulator
+aaj	*de
+aap	*dd
+amw	*db
+aow	*d7
+
+# From RAM
+maj	*be
+map	*bd
+mow	*b7
+
+# From input
+iaj	*be
+iap	*bd
+imw	*bb
+iow	*b7
